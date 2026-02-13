@@ -54,11 +54,12 @@ js/12_25.js  → December 25th
 Each file defines a single movie object — dead simple:
 
 ```js
-movieData = {
-    movie: "The Shawshank Redemption",
-    year: "1994",
-    imdb_id: "tt0111161",
-    rotten_tomatoes_slug: "the_shawshank_redemption"
+movieData =
+{
+	movie: "The Shawshank Redemption",
+	year: "1994",
+	imdb_id: "tt0111161",
+	rotten_tomatoes_slug: "the_shawshank_redemption"
 };
 ```
 
@@ -151,15 +152,16 @@ Five breakpoints ensure the theater looks incredible on everything from ultrawid
 It takes about 60 seconds:
 
 1. **Create the data file** for the target date in `js/`:
-   ```js
-   // js/2_14.js — Valentine's Day pick
-   movieData = {
-       movie: "When Harry Met Sally",
-       year: "1989",
-       imdb_id: "tt0098635",
-       rotten_tomatoes_slug: "when_harry_met_sally"
-   };
-   ```
+	```js
+	// js/2_14.js — Valentine's Day pick
+	movieData =
+	{
+		movie: "When Harry Met Sally",
+		year: "1989",
+		imdb_id: "tt0098635",
+		rotten_tomatoes_slug: "when_harry_met_sally"
+		};
+	```
 2. **Drop in the poster** → `images/posters/when_harry_met_sally.jpg`
 3. **Drop in the preview** → `images/previews/when_harry_met_sally.jpg`
 4. **Push to GitHub.** Done. The site updates automatically.
