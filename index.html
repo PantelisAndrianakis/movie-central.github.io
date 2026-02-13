@@ -25,13 +25,13 @@
 				<!-- Left Column. -->
 				<div class="left-column">
 					<div class="image-box z500">
-						<img src="" alt="Played three days ago!">
+						<img src="" alt="Played three days ago!" title="Played three days ago!">
 					</div>
 					<div class="image-box z600">
-						<img src="" alt="Played two days ago!">
+						<img src="" alt="Played two days ago!" title="Played two days ago!">
 					</div>
 					<div class="image-box z700">
-						<img src="" alt="Played yesterday!">
+						<img src="" alt="Played yesterday!" title="Played yesterday!">
 					</div>
 				</div>
 				
@@ -43,13 +43,13 @@
 				<!-- Right Column. -->
 				<div class="right-column">
 					<div class="image-box z500">
-						<img src="" alt="Coming tomorrow!">
+						<img src="" alt="Coming tomorrow!" title="Coming tomorrow!">
 					</div>
 					<div class="image-box z600">
-						<img src="" alt="Coming in two days!">
+						<img src="" alt="Coming in two days!" title="Coming in two days!">
 					</div>
 					<div class="image-box z700">
-						<img src="" alt="Coming in three days!">
+						<img src="" alt="Coming in three days!" title="Coming in three days!">
 					</div>
 				</div>
 			</div>
@@ -58,10 +58,10 @@
 		<!-- Bottom Row (stays visible). -->
 		<div class="bottom-row">
 			<div class="bottom-box z800">
-				<img src="images/arrow_left.png" alt="See yesterday's schedule">
+				<img src="images/arrow_left.png" alt="See yesterday's movie" title="See yesterday's movie">
 			</div>
 			<div class="bottom-box z850">
-				<img src="images/popcorn_imdb.png" alt="View at IMDB">
+				<img src="images/popcorn_imdb.png" alt="View at IMDB" title="View at IMDB">
 			</div>
 			<div class="bottom-box-center z950">
 				<img src="images/ticket.png" alt="Current movie">
@@ -69,10 +69,10 @@
 				<div class="ticket-year" id="movieYear">----</div>
 			</div>
 			<div class="bottom-box z850">
-				<img src="images/popcorn_rt.png" alt="View at Rotten Tomatoes">
+				<img src="images/popcorn_rt.png" alt="View at Rotten Tomatoes" title="View at Rotten Tomatoes">
 			</div>
 			<div class="bottom-box z800">
-				<img src="images/arrow_right.png" alt="See tomorrow's schedule">
+				<img src="images/arrow_right.png" alt="See tomorrow's movie" title="See tomorrow's movie">
 			</div>
 		</div>
 		
@@ -173,6 +173,8 @@
 				img.onclick = null;
 				img.style.cursor = 'default';
 				img.parentElement.style.cursor = 'default';
+				img.alt = '';
+				img.title = '';
 				
 				const offset = offsets[index];
 				const data = allMovieData[offset];
@@ -181,6 +183,7 @@
 				const slug = data.rotten_tomatoes_slug.replace(/^\//, '');
 				img.src = `images/previews/${slug}.jpg`;
 				img.alt = `${descriptions[index]}: ${data.movie}`;
+				img.title = `${descriptions[index]}: ${data.movie}`;
 				img.style.cursor = 'pointer';
 				img.parentElement.style.cursor = 'pointer';
 				img.onclick = () =>
@@ -237,22 +240,39 @@
 			// IMDB link.
 			if (imdbBox)
 			{
+				const imdbImg = imdbBox.querySelector('img');
 				imdbBox.style.cursor = movieData?.imdb_id ? 'pointer' : 'default';
-				imdbBox.onclick = movieData?.imdb_id
-					? () => window.open(`https://www.imdb.com/title/${movieData.imdb_id}/`, '_blank')
-					: null;
+				imdbBox.onclick = movieData?.imdb_id ? () => window.open(`https://www.imdb.com/title/${movieData.imdb_id}/`, '_blank') : null;
+				
+				if (imdbImg && movieData?.movie)
+				{
+					imdbImg.title = `View ${movieData.movie} at IMDB`;
+				}
+				else if (imdbImg)
+				{
+					imdbImg.title = 'View at IMDB';
+				}
 			}
 			
 			// Rotten Tomatoes link.
 			if (rtBox)
 			{
+				const rtImg = rtBox.querySelector('img');
 				rtBox.style.cursor = movieData?.rotten_tomatoes_slug ? 'pointer' : 'default';
-				rtBox.onclick = movieData?.rotten_tomatoes_slug
-					? () => {
-						const slug = movieData.rotten_tomatoes_slug.replace(/^\//, '');
-						window.open(`https://www.rottentomatoes.com/m/${slug}`, '_blank');
-					}
-					: null;
+				rtBox.onclick = movieData?.rotten_tomatoes_slug ? () =>
+				{
+					const slug = movieData.rotten_tomatoes_slug.replace(/^\//, '');
+					window.open(`https://www.rottentomatoes.com/m/${slug}`, '_blank');
+				} : null;
+				
+				if (rtImg && movieData?.movie)
+				{
+					rtImg.title = `View ${movieData.movie} at Rotten Tomatoes`;
+				}
+				else if (rtImg)
+				{
+					rtImg.title = 'View at Rotten Tomatoes';
+				}
 			}
 			
 			// Navigation arrows.
@@ -357,9 +377,25 @@
 					document.getElementById('movieTitle').textContent = 'No movie scheduled';
 					document.getElementById('movieYear').textContent = '';
 					
-					document.querySelector('.center-feature img').src = '';
-					document.querySelectorAll('.left-column .image-box img').forEach(img => img.src = '');
-					document.querySelectorAll('.right-column .image-box img').forEach(img => img.src = '');
+					const centerImg = document.querySelector('.center-feature img');
+					if (centerImg)
+					{
+						centerImg.src = '';
+						centerImg.alt = 'Playing today!';
+					}
+					
+					document.querySelectorAll('.left-column .image-box img').forEach(img =>
+					{
+						img.src = '';
+						img.alt = '';
+						img.title = '';
+					});
+					document.querySelectorAll('.right-column .image-box img').forEach(img =>
+					{
+						img.src = '';
+						img.alt = '';
+						img.title = '';
+					});
 				}
 				
 				// Update browser history.
