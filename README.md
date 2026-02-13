@@ -179,8 +179,6 @@ Both loaded from Google Fonts — no self-hosting overhead.
 
 ## 📜 License
 
-## 📜 License
-
 **Code:** MIT License - see [LICENSE.txt](LICENSE.txt) for details.
 
 **Movie Assets:** All movie metadata, poster artwork, and associated trademarks belong to their respective owners and studios. This project is a fan-built showcase celebrating the art of cinema — a digital marquee, not a movie theater. It points you toward great films; it doesn't deliver them. For that, you'll need your preferred streaming service, rental platform, or a good old-fashioned DVD collection.
