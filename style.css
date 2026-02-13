@@ -70,7 +70,7 @@ body {
 	flex-direction: column;
 	overflow: hidden;
 	opacity: 0;
-	transition: opacity 0.6s ease-in-out; // Match HTML transition duration.
+	transition: opacity 0.3s ease-in-out; // Match HTML transition duration.
 	margin-bottom: 0.3%;
 }
 
