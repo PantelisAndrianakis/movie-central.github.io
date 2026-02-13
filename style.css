@@ -11,20 +11,27 @@ html {
 	background-position: center center;
 	background-attachment: fixed;
 	background-size: cover;
-	min-height: 100vh;
+	height: 100%;
 	overflow-y: auto;
 }
 
 body {
-	min-height: 100vh;
+	height: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
 
+/* Safari iOS fix */
+@supports (-webkit-touch-callout: none) {
+	html, body {
+		height: -webkit-fill-available;
+	}
+}
+
 .spacer-top,
 .spacer-bottom {
-	height: 5vh;  /* Fallback for older browsers */
+	height: 5vh; /* Fallback for older browsers */
 	height: 5dvh; /* Modern browsers - dynamic viewport height */
 	flex-shrink: 0;
 	width: 100%;
@@ -65,8 +72,8 @@ body {
 /* Content Container (fades in/out) */
 .container {
 	width: 45%;
-	flex: 1;
-	flex-shrink: 0;
+	flex: 1 1 0; /* Allow growing/shrinking */
+	min-height: 0; /* Critical for flexbox children to respect parent */
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
@@ -88,8 +95,8 @@ body {
 	display: grid;
 	grid-template-columns: 19.1% 57.8% 19.1%;
 	gap: 2%;
-	flex: 1 1 0;
-	min-height: 0;
+	flex: 1 1 0; /* Fill container */
+	min-height: 0; /* Critical for nested flex/grid */
 }
 
 /* Side Columns (Left & Right) */
@@ -104,8 +111,8 @@ body {
 .image-box {
 	width: 100%;
 	position: relative;
-	flex: 1 1 0;
-	min-height: 0;
+	flex: 1 1 0; /* Distribute space evenly */
+	min-height: 0; /* Allow shrinking */
 }
 
 .image-box img {
@@ -155,8 +162,8 @@ body {
 
 .bottom-box img {
 	width: 100%;
-	max-height: 25vh;  /* Fallback for older browsers */
-	max-height: 25dvh; /* Modern browsers - dynamic viewport height */
+	max-height: 25vh;  /* Fallback for older browsers. */
+	max-height: 25dvh; /* Modern browsers - dynamic viewport height. */
 	height: auto;
 	display: block;
 	object-fit: contain;
@@ -168,7 +175,7 @@ body {
 	filter: brightness(1.15);
 }
 
-/* Aspect-ratio locked ticket container with container query units */
+/* Aspect-ratio locked ticket container with container query units. */
 .bottom-box-center {
 	position: relative;
 	container-type: inline-size;
@@ -286,7 +293,7 @@ body {
 	}
 	.image-box img {
 		height: auto;
-		max-height: 12vh;
+		max-height: 12dvh;
 	}
 	
 	/* Bottom row: ticket on top, controls below. */
@@ -324,6 +331,18 @@ body {
 		flex-direction: column;
 	}
 	.image-box img {
-		max-height: 10vh;
+		max-height: 10dvh; /* Use dvh here too. */
+	}
+}
+
+/* Special handling for very short heights. */
+@media (max-height: 600px) {
+	.spacer-top,
+	.spacer-bottom {
+		height: 3dvh; /* Smaller spacers on short screens. */
+	}
+	
+	.image-box img {
+		max-height: 20dvh;
 	}
 }
