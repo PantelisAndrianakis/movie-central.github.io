@@ -299,6 +299,23 @@
 		
 		// --- Navigation (single unified flow) ---
 		
+		// Helper to wait for an image to fully load.
+		function waitForImage(img)
+		{
+			return new Promise((resolve) =>
+			{
+				if (!img.src || img.complete)
+				{
+					resolve();
+				}
+				else
+				{
+					img.onload = () => resolve();
+					img.onerror = () => resolve(); // Resolve on error to prevent hanging.
+				}
+			});
+		}
+		
 		async function navigateToDate(year, month, day, replaceState = false)
 		{
 			// Anti-spam protection: prevent navigation if already in progress or on cooldown.
@@ -329,6 +346,11 @@
 				{
 					updatePageWithData();
 					fitText();
+					
+					// Wait for all images to load before fading in.
+					const imagesToLoad = [document.querySelector('.center-feature img'), ...document.querySelectorAll('.left-column .image-box img'), ...document.querySelectorAll('.right-column .image-box img')];
+					
+					await Promise.all(imagesToLoad.map(img => waitForImage(img)));
 				}
 				else
 				{
