@@ -317,7 +317,7 @@
 			{
 				container.classList.remove('fade-in');
 				container.classList.add('fade-out');
-				await new Promise(resolve => setTimeout(resolve, 300));
+				await new Promise(resolve => setTimeout(resolve, 600)); // Match CSS transition duration.
 			}
 			
 			try
