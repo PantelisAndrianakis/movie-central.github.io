@@ -1,0 +1,325 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html {
+	background-color: #000000;
+	background-image: url("images/theater.jpg");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-attachment: fixed;
+	background-size: cover;
+	min-height: 100vh;
+	overflow-y: auto;
+}
+
+body {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.spacer-top,
+.spacer-bottom {
+	height: 5vh;
+	flex-shrink: 0;
+	width: 100%;
+}
+
+/* Top Banner (stays visible, doesn't fade) */
+.top-banner {
+	width: 31.5%;
+	flex: 0 0 auto;
+	margin-bottom: 0.5%;
+	position: relative;
+}
+
+.top-banner img {
+	width: 100%;
+	height: auto;
+	display: block;
+	object-fit: contain;
+}
+
+.banner-text {
+	position: absolute;
+	top: 50%;
+	left: 5%;
+	right: 5%;
+	transform: translateY(-50%);
+	font-family: 'Philosopher', serif;
+	font-size: 3vw;
+	font-weight: 700;
+	color: #211c1c;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+	text-align: center;
+	white-space: nowrap;
+	pointer-events: none;
+	letter-spacing: 0.1em;
+}
+
+/* Content Container (fades in/out) */
+.container {
+	width: 45%;
+	flex: 1;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	opacity: 0;
+	transition: opacity 0.3s ease-in-out;
+	margin-bottom: 0.3%;
+}
+
+.container.fade-in {
+	opacity: 1;
+}
+
+.container.fade-out {
+	opacity: 0;
+}
+
+/* Main Grid Layout */
+.main-grid {
+	display: grid;
+	grid-template-columns: 19.1% 57.8% 19.1%;
+	gap: 2%;
+	flex: 1 1 0;
+	min-height: 0;
+}
+
+/* Side Columns (Left & Right) */
+.left-column,
+.right-column {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+}
+
+.image-box {
+	width: 100%;
+	position: relative;
+	flex: 1 1 0;
+	min-height: 0;
+}
+
+.image-box img {
+	width: 100%;
+	height: 100%;
+	display: block;
+	object-fit: contain;
+	transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.image-box:hover img {
+	transform: scale(1.05);
+	filter: brightness(1.1);
+}
+
+.image-box:not(:last-child) {
+	margin-bottom: 2%;
+}
+
+/* Center Feature */
+.center-feature {
+	display: flex;
+	align-items: center;
+	height: 100%;
+	min-height: 0;
+}
+
+.center-feature img {
+	width: 100%;
+	height: 100%;
+	display: block;
+	object-fit: contain;
+}
+
+/* Bottom Row (stays visible, doesn't fade) */
+.bottom-row {
+	width: 45%;
+	display: grid;
+	grid-template-columns: 13.2% 13.2% 40% 13.2% 13.2%;
+	gap: 1.8%;
+	flex: 0 0 auto;
+	margin-top: 0.5%;
+	align-items: center;
+}
+
+.bottom-box img {
+	width: 100%;
+	max-height: 25vh;
+	height: auto;
+	display: block;
+	object-fit: contain;
+	transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.bottom-box:hover img {
+	transform: scale(1.1);
+	filter: brightness(1.15);
+}
+
+/* Aspect-ratio locked ticket container with container query units */
+.bottom-box-center {
+	position: relative;
+	container-type: inline-size;
+	aspect-ratio: 1865 / 675;
+	width: 100%;
+}
+
+.bottom-box-center img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+	object-fit: fill;
+}
+
+.ticket-title {
+	position: absolute;
+	top: 50%;
+	left: 10%;
+	right: 20%;
+	transform: translateY(-50%);
+	font-family: 'Philosopher', serif;
+	font-weight: 700;
+	color: #1a1a1a;
+	text-align: center;
+	line-height: 1.1;
+	pointer-events: none;
+}
+
+.ticket-year {
+	position: absolute;
+	right: 6.5%;
+	top: 50%;
+	transform: translateY(-50%) rotate(90deg);
+	transform-origin: center;
+	font-family: 'Source Sans Pro', sans-serif;
+	font-size: 6cqi;
+	font-weight: 700;
+	color: #9b916f;
+	pointer-events: none;
+}
+
+/* Z-Index Classes */
+.z500  { z-index: 500; }
+.z600  { z-index: 600; }
+.z700  { z-index: 700; }
+.z800  { z-index: 800; }
+.z850  { z-index: 850; }
+.z950  { z-index: 950; }
+.z1000 { z-index: 1000; }
+.z1100 { z-index: 1100; }
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+	.container,
+	.bottom-row {
+		width: 62%;
+	}
+	.top-banner {
+		width: 43.4%;
+	}
+}
+
+@media (max-width: 1200px) {
+	.container,
+	.bottom-row {
+		width: 70%;
+	}
+	.top-banner {
+		width: 49%;
+	}
+}
+
+@media (max-width: 1024px) {
+	.container,
+	.bottom-row {
+		width: 78%;
+	}
+	.top-banner {
+		width: 54.6%;
+	}
+	.main-grid {
+		grid-template-columns: 20% 56% 20%;
+	}
+	.bottom-row {
+		grid-template-columns: 14% 14% 40% 14% 14%;
+		gap: 2%;
+	}
+}
+
+@media (max-width: 768px) {
+	.container,
+	.bottom-row {
+		width: 86%;
+	}
+	.top-banner {
+		width: 60.2%;
+	}
+	.main-grid {
+		grid-template-columns: 1fr;
+		gap: 1.5%;
+	}
+	
+	/* Side images in horizontal rows. */
+	.left-column,
+	.right-column {
+		flex-direction: row;
+		gap: 1.5%;
+		height: auto;
+	}
+	.image-box {
+		flex: 1;
+		height: auto;
+	}
+	.image-box img {
+		height: auto;
+		max-height: 12vh;
+	}
+	
+	/* Bottom row: ticket on top, controls below. */
+	.bottom-row {
+		grid-template-columns: 1fr 1fr 1fr 1fr;
+		grid-template-rows: auto auto;
+		gap: 1.5%;
+	}
+	.bottom-box-center {
+		grid-column: 1 / -1;
+		grid-row: 1;
+	}
+	.bottom-box:nth-child(1) { grid-column: 1; grid-row: 2; }
+	.bottom-box:nth-child(2) { grid-column: 2; grid-row: 2; }
+	.bottom-box:nth-child(4) { grid-column: 3; grid-row: 2; }
+	.bottom-box:nth-child(5) { grid-column: 4; grid-row: 2; }
+	
+	.banner-text {
+		font-size: 5.6vw;
+	}
+}
+
+@media (max-width: 480px) {
+	.container,
+	.bottom-row {
+		width: 92%;
+	}
+	.top-banner {
+		width: 64.4%;
+	}
+	
+	/* Stack side images vertically at smallest sizes. */
+	.left-column,
+	.right-column {
+		flex-direction: column;
+	}
+	.image-box img {
+		max-height: 10vh;
+	}
+}

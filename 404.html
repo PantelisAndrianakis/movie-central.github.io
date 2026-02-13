@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Philosopher:400,700,700i&display=swap">
+		<link rel="icon" type="image/png" href="images/popcorn.png">
+		<title>404 - Movie not found!</title>
+		<style>
+			body {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 100vh;
+				font-family: 'Philosopher', sans-serif;
+			}
+			.center-piece {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				text-align: center;
+			}
+			.error-code {
+				font-size: clamp(7rem, 20vw, 14rem);
+				font-weight: 700;
+				color: #f5e7c8;
+				text-shadow: 0 0 25px rgba(255, 200, 0, 0.7), 0 0 60px black;
+				line-height: 1;
+				margin-bottom: 0.5rem;
+				letter-spacing: 5px;
+			}
+			.error-message {
+				font-size: clamp(2.2rem, 8vw, 4rem);
+				font-weight: 700;
+				color: #f5e7c8;
+				text-shadow: 0 0 20px rgba(255, 200, 0, 0.6), 0 0 45px black;
+				letter-spacing: 0.02em;
+				line-height: 1.2;
+				padding: 0 1rem;
+			}
+			.popcorn-center {
+				width: 130px;
+				height: auto;
+				margin-top: 0.2rem;
+				margin-bottom: 1.2rem;
+				opacity: 0.95;
+				filter: drop-shadow(0 0 22px rgba(255, 215, 0, 0.5));
+			}
+		</style>
+	</head>
+	<body>
+		<div class="center-piece">
+			<div class="error-code">404</div>
+			<div class="error-message">Movie not found!</div>
+			<img src="images/popcorn.png" alt="popcorn" class="popcorn-center">
+		</div>
+	</body>
+</html>

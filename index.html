@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Philosopher:400,400i,700,700i&display=swap">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700&display=swap">
+		<link rel="icon" type="image/png" href="images/popcorn.png">
+		<title>Movie Central</title>
+	</head>
+	<body>
+		<div class="spacer-top"></div>
+		
+		<!-- Top Banner (stays visible). -->
+		<div class="top-banner">
+			<img src="images/marquee.png" alt="Movie Central" class="z1100">
+			<div class="banner-text">Movie Central</div>
+		</div>
+		
+		<!-- Content Container (fades). -->
+		<div class="container">
+			<!-- Main Content Grid. -->
+			<div class="main-grid">
+				<!-- Left Column. -->
+				<div class="left-column">
+					<div class="image-box z500">
+						<img src="" alt="Played three days ago!">
+					</div>
+					<div class="image-box z600">
+						<img src="" alt="Played two days ago!">
+					</div>
+					<div class="image-box z700">
+						<img src="" alt="Played yesterday!">
+					</div>
+				</div>
+				
+				<!-- Center Feature. -->
+				<div class="center-feature">
+					<img src="" alt="Playing today!" class="z1000">
+				</div>
+				
+				<!-- Right Column. -->
+				<div class="right-column">
+					<div class="image-box z500">
+						<img src="" alt="Coming tomorrow!">
+					</div>
+					<div class="image-box z600">
+						<img src="" alt="Coming in two days!">
+					</div>
+					<div class="image-box z700">
+						<img src="" alt="Coming in three days!">
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Bottom Row (stays visible). -->
+		<div class="bottom-row">
+			<div class="bottom-box z800">
+				<img src="images/arrow_left.png" alt="See yesterday's schedule">
+			</div>
+			<div class="bottom-box z850">
+				<img src="images/popcorn_imdb.png" alt="View at IMDB">
+			</div>
+			<div class="bottom-box-center z950">
+				<img src="images/ticket.png" alt="Current movie">
+				<div class="ticket-title" id="movieTitle">Loading...</div>
+				<div class="ticket-year" id="movieYear">----</div>
+			</div>
+			<div class="bottom-box z850">
+				<img src="images/popcorn_rt.png" alt="View at Rotten Tomatoes">
+			</div>
+			<div class="bottom-box z800">
+				<img src="images/arrow_right.png" alt="See tomorrow's schedule">
+			</div>
+		</div>
+		
+		<div class="spacer-bottom"></div>
+		
+		<script>
+		// Global state.
+		let movieData = null;
+		let allMovieData = {};
+		let currentDate = null;
+		let isNavigating = false;
+		let navigationCooldown = null;
+		
+		// --- Utility ---
+		
+		// Native Date arithmetic replaces isLeapYear + getDaysInMonth + addDays.
+		function addDays(date, days)
+		{
+			const result = new Date(date);
+			result.setDate(result.getDate() + days);
+			return result;
+		}
+		
+		function getDateParts(date)
+		{
+			return {
+				year: date.getFullYear(),
+				month: date.getMonth() + 1,
+				day: date.getDate()
+			};
+		}
+		
+		// --- Data Loading ---
+		
+		// Load a single day's movie data via script injection.
+		function loadMovieDataForDate(date)
+		{
+			const m = date.getMonth() + 1;
+			const d = date.getDate();
+			const jsPath = `js/${m}_${d}.js?t=${Date.now()}`;
+			
+			return new Promise(resolve =>
+			{
+				// Remove previous movie data scripts.
+				document.querySelectorAll('script[data-movie-script]').forEach(s => s.remove());
+				
+				window.movieData = null;
+				
+				const script = document.createElement('script');
+				script.src = jsPath;
+				script.dataset.movieScript = 'true';
+				script.onload = () =>
+				{
+					if (window.movieData)
+					{
+						const dataCopy = { ...window.movieData };
+						window.movieData = null;
+						resolve(dataCopy);
+					}
+					else
+					{
+						resolve(null);
+					}
+				};
+				script.onerror = () => resolve(null);
+				document.head.appendChild(script);
+			});
+		}
+		
+		// Load movie data for the current date and 3 days in each direction.
+		async function loadWeekData()
+		{
+			allMovieData = {};
+			
+			for (const offset of [-3, -2, -1, 0, 1, 2, 3])
+			{
+				const date = addDays(currentDate, offset);
+				const data = await loadMovieDataForDate(date);
+				if (data)
+				{
+					allMovieData[offset] = data;
+				}
+			}
+			
+			movieData = allMovieData[0] || null;
+		}
+		
+		// --- Page Updates ---
+		
+		// Update a column of side images (left or right).
+		function updateSideColumn(selector, offsets, descriptions)
+		{
+			const images = document.querySelectorAll(`${selector} .image-box img`);
+			
+			images.forEach((img, index) =>
+			{
+				img.src = '';
+				img.onclick = null;
+				img.style.cursor = 'default';
+				img.parentElement.style.cursor = 'default';
+				
+				const offset = offsets[index];
+				const data = allMovieData[offset];
+				if (!data) return;
+				
+				const slug = data.rotten_tomatoes_slug.replace(/^\//, '');
+				img.src = `images/previews/${slug}.jpg`;
+				img.alt = `${descriptions[index]}: ${data.movie}`;
+				img.style.cursor = 'pointer';
+				img.parentElement.style.cursor = 'pointer';
+				img.onclick = () =>
+				{
+					const target = addDays(currentDate, offset);
+					const { year, month, day } = getDateParts(target);
+					navigateToDate(year, month, day);
+				};
+			});
+		}
+		
+		function updatePageWithData()
+		{
+			// Ticket title and year.
+			document.getElementById('movieTitle').textContent = movieData?.movie || 'No movie scheduled';
+			document.getElementById('movieYear').textContent = movieData?.year || '';
+			
+			// Side columns.
+			updateSideColumn('.left-column',
+				[-3, -2, -1],
+				['Played three days ago', 'Played two days ago', 'Played yesterday']
+			);
+			updateSideColumn('.right-column',
+				[3, 2, 1],
+				['Coming in three days', 'Coming in two days', 'Coming tomorrow']
+			);
+			
+			// Center poster.
+			const centerImg = document.querySelector('.center-feature img');
+			if (centerImg)
+			{
+				if (movieData?.rotten_tomatoes_slug)
+				{
+					const slug = movieData.rotten_tomatoes_slug.replace(/^\//, '');
+					centerImg.src = `images/posters/${slug}.jpg`;
+					centerImg.alt = `Playing today: ${movieData.movie}`;
+				}
+				else
+				{
+					centerImg.src = '';
+				}
+			}
+			
+			// External links and navigation.
+			setupBottomRow();
+		}
+		
+		// Setup IMDB, Rotten Tomatoes links and navigation arrows.
+		function setupBottomRow()
+		{
+			const boxes = document.querySelectorAll('.bottom-box');
+			const [leftArrow, imdbBox, rtBox, rightArrow] = [boxes[0], boxes[1], boxes[2], boxes[3]];
+			
+			// IMDB link.
+			if (imdbBox)
+			{
+				imdbBox.style.cursor = movieData?.imdb_id ? 'pointer' : 'default';
+				imdbBox.onclick = movieData?.imdb_id
+					? () => window.open(`https://www.imdb.com/title/${movieData.imdb_id}/`, '_blank')
+					: null;
+			}
+			
+			// Rotten Tomatoes link.
+			if (rtBox)
+			{
+				rtBox.style.cursor = movieData?.rotten_tomatoes_slug ? 'pointer' : 'default';
+				rtBox.onclick = movieData?.rotten_tomatoes_slug
+					? () => {
+						const slug = movieData.rotten_tomatoes_slug.replace(/^\//, '');
+						window.open(`https://www.rottentomatoes.com/m/${slug}`, '_blank');
+					}
+					: null;
+			}
+			
+			// Navigation arrows.
+			function arrowClick(offset)
+			{
+				return () =>
+				{
+					const target = addDays(currentDate, offset);
+					const { year, month, day } = getDateParts(target);
+					navigateToDate(year, month, day);
+				};
+			}
+			
+			if (leftArrow)
+			{
+				leftArrow.style.cursor = 'pointer';
+				leftArrow.onclick = arrowClick(-1);
+			}
+			if (rightArrow)
+			{
+				rightArrow.style.cursor = 'pointer';
+				rightArrow.onclick = arrowClick(1);
+			}
+		}
+		
+		function fitText()
+		{
+			const element = document.getElementById('movieTitle');
+			const text = element.textContent.trim();
+			
+			element.style.wordBreak = 'break-word';
+			
+			if (text.length < 15)
+			{
+				element.style.fontSize = 'clamp(2.5rem, 10cqi, 6rem)';
+				element.style.whiteSpace = 'nowrap';
+			}
+			else
+			{
+				element.style.fontSize = 'clamp(1.0rem, 6cqi, 2.5rem)';
+				element.style.whiteSpace = 'normal';
+			}
+		}
+		
+		// --- Navigation (single unified flow) ---
+		
+		async function navigateToDate(year, month, day, replaceState = false)
+		{
+			// Anti-spam protection: prevent navigation if already in progress or on cooldown.
+			if (isNavigating || navigationCooldown)
+			{
+				return;
+			}
+			
+			isNavigating = true;
+			
+			const container = document.querySelector('.container');
+			const isInitialLoad = !container.classList.contains('fade-in');
+			
+			// Fade out (skip on initial load since it's already invisible).
+			if (!isInitialLoad)
+			{
+				container.classList.remove('fade-in');
+				container.classList.add('fade-out');
+				await new Promise(resolve => setTimeout(resolve, 300));
+			}
+			
+			try
+			{
+				currentDate = new Date(year, month - 1, day);
+				await loadWeekData();
+				
+				if (movieData)
+				{
+					updatePageWithData();
+					fitText();
+				}
+				else
+				{
+					document.getElementById('movieTitle').textContent = 'No movie scheduled';
+					document.getElementById('movieYear').textContent = '';
+					
+					document.querySelector('.center-feature img').src = '';
+					document.querySelectorAll('.left-column .image-box img').forEach(img => img.src = '');
+					document.querySelectorAll('.right-column .image-box img').forEach(img => img.src = '');
+				}
+				
+				// Update browser history.
+				const url = `?year=${year}&month=${month}&day=${day}`;
+				if (replaceState)
+				{
+					history.replaceState({ year, month, day }, '', url);
+				}
+				else
+				{
+					history.pushState({ year, month, day }, '', url);
+				}
+			}
+			catch (error)
+			{
+				document.getElementById('movieTitle').textContent = 'No movie scheduled';
+				document.getElementById('movieYear').textContent = '';
+			}
+			finally
+			{
+				setTimeout(() =>
+				{
+					container.classList.remove('fade-out');
+					container.classList.add('fade-in');
+					
+					// Reset navigation flag after fade-in completes.
+					setTimeout(() =>
+					{
+						isNavigating = false;
+						
+						// Add a short cooldown to prevent spam.
+						navigationCooldown = setTimeout(() =>
+						{
+							navigationCooldown = null;
+						}, 200);
+					}, 400); // Wait for fade-in animation (300ms) + small buffer.
+				}, 50);
+			}
+		}
+		
+		// --- Initialization ---
+		
+		window.addEventListener('load', () =>
+		{
+			const urlParams = new URLSearchParams(window.location.search);
+			const year = urlParams.get('year');
+			const month = urlParams.get('month');
+			const day = urlParams.get('day');
+			
+			if (year && month && day)
+			{
+				navigateToDate(parseInt(year), parseInt(month), parseInt(day), true);
+			}
+			else
+			{
+				const now = new Date();
+				navigateToDate(now.getFullYear(), now.getMonth() + 1, now.getDate(), true);
+			}
+		});
+		
+		window.addEventListener('resize', fitText);
+		
+		// Handle browser back/forward buttons.
+		window.addEventListener('popstate', (event) =>
+		{
+			if (event.state?.year && event.state?.month && event.state?.day)
+			{
+				navigateToDate(event.state.year, event.state.month, event.state.day, true);
+			}
+		});
+		
+		// Handle keyboard navigation with arrow keys.
+		window.addEventListener('keydown', (event) =>
+		{
+			// Only handle arrow keys, ignore if user is typing in an input field.
+			if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA')
+			{
+				return;
+			}
+			
+			if (event.key === 'ArrowLeft')
+			{
+				event.preventDefault();
+				const target = addDays(currentDate, -1);
+				const { year, month, day } = getDateParts(target);
+				navigateToDate(year, month, day);
+			}
+			else if (event.key === 'ArrowRight')
+			{
+				event.preventDefault();
+				const target = addDays(currentDate, 1);
+				const { year, month, day } = getDateParts(target);
+				navigateToDate(year, month, day);
+			}
+		});
+		</script>
+	</body>
+</html>
