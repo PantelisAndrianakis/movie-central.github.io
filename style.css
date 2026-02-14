@@ -312,3 +312,34 @@ body {
 		max-height: 20dvh;
 	}
 }
+
+/* Mobile ticket text fixes. */
+@media (max-width: 768px) {
+	.ticket-title {
+		left: 6% !important;
+		right: 16% !important;
+		font-size: clamp(0.55rem, 4.5cqi, 1.4rem) !important;
+		line-height: 1.05;
+		word-break: break-word !important;
+		white-space: normal !important;
+	}
+
+	.ticket-year {
+		font-size: 5cqi;
+		right: 5%;
+	}
+}
+
+@media (max-width: 480px) {
+	.ticket-title {
+		left: 5% !important;
+		right: 15% !important;
+		font-size: clamp(0.45rem, 4cqi, 1.1rem) !important;
+		line-height: 1.0;
+	}
+
+	.ticket-year {
+		font-size: 4.5cqi;
+		right: 4%;
+	}
+}
